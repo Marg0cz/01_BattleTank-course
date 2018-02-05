@@ -21,6 +21,14 @@ class BATTLETANK_API ATankPlayerController : public APlayerController
 
 	virtual void Tick(float DeltaTime) override;
 
+	// Return current start of reach line
+	FVector GetReachLineStart() const;
+
+	// Return current end of reach line
+	FVector GetReachLineEnd() const;
+
 	void AimTowardsCrosshair();
+
+	bool GetSightRayHitLocation(FVector& OutHitLocation) const;
 	
 };
