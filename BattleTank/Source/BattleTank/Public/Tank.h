@@ -19,7 +19,7 @@ public:
 	void AimAt(FVector HitLocation);
 
 	UFUNCTION(BlueprintCallable, Category = Setup)
-	void SetBarrelRefrence(UStaticMeshComponent* BarrelToSet);
+	void SetBarrelRefrence(UTankBarrel* BarrelToSet);
 
 private:
 	// Sets default values for this pawn's properties
