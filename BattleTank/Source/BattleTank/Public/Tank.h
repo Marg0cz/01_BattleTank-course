@@ -19,6 +19,7 @@ class BATTLETANK_API ATank : public APawn
 
 protected:
 	UAimingComponent * AimingComponent = nullptr;
+	
 
 public:
 	void AimAt(FVector HitLocation);
@@ -49,6 +50,10 @@ private:
 		TSubclassOf<AProjectile> BlueprintSpawnable;
 
 	UTankBarrel * Barrel = nullptr;
+
+	float ReloadTimeInSeconds = 3;
+
+	double LastFireTime = 0;
 
 
 
