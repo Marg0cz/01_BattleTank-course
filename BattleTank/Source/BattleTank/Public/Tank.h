@@ -11,6 +11,7 @@ class UAimingComponent;
 class UTankBarrel;
 class UTankTurret;
 class AProjectile;
+class UTankTrack;
 
 UCLASS()
 class BATTLETANK_API ATank : public APawn
@@ -19,11 +20,13 @@ class BATTLETANK_API ATank : public APawn
 
 protected:
 	UAimingComponent * AimingComponent = nullptr;
-	
+
 
 public:
 	void AimAt(FVector HitLocation);
 
+	UFUNCTION(BlueprintCallable, Category = Setup)
+		void SetTrackReference(UTankTrack * TrackToSet);
 	UFUNCTION(BlueprintCallable, Category = Setup)
 		void SetBarrelRefrence(UTankBarrel* BarrelToSet);
 	UFUNCTION(BlueprintCallable, Category = Setup)
@@ -43,13 +46,14 @@ private:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(EditAnywhere, Category = Firing)
-		float LaunchSpeed = 100000; // TODO Find sensible default
+	UPROPERTY(EditDefaultsOnly, Category = Firing)
+		float LaunchSpeed = 5000;
 
-	UPROPERTY(EditAnywhere, Category = Setup)
+	UPROPERTY(EditDefaultsOnly, Category = Setup)
 		TSubclassOf<AProjectile> BlueprintSpawnable;
 
 	UTankBarrel * Barrel = nullptr;
+	UTankTrack * Track = nullptr;
 
 	float ReloadTimeInSeconds = 3;
 

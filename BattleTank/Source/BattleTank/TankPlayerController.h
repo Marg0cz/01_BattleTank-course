@@ -28,9 +28,9 @@ private:
 
 	bool GetSightRayHitLocation(FVector& OutHitLocation) const;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly, Category = Setup)
 	float CrosshairLocationX = 0.5;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly, Category = Setup)
 	float CrosshairLocationY = 0.33333;
 
 	bool GetLookDirection(FVector2D ScreenLocation, FVector &OutHitLocation) const;

@@ -38,6 +38,11 @@ void ATank::AimAt(FVector HitLocation)
 
 }
 
+void ATank::SetTrackReference(UTankTrack * TrackToSet)
+{
+	Track = TrackToSet;
+}
+
 void ATank::SetBarrelRefrence(UTankBarrel * BarrelToSet)
 {
 	AimingComponent->SetBarrelReference(BarrelToSet);
@@ -51,7 +56,7 @@ void ATank::SetTurretReference(UTankTurret * TurretToSet)
 
 void ATank::Fire()
 {
-	bool isReloaded = (FPlatformTime::Seconds() - LastFireTime) > ReloadTimeInSeconds;
+	bool isReloaded = (GetWorld()->GetTimeSeconds() - LastFireTime) > ReloadTimeInSeconds;
 
 	if (Barrel && isReloaded)
 	{
@@ -61,7 +66,7 @@ void ATank::Fire()
 			);
 
 		Projectile->LaunchProjectile(LaunchSpeed);
-		LastFireTime = FPlatformTime::Seconds();
+		LastFireTime = GetWorld()->GetTimeSeconds();
 	}
 }
 
