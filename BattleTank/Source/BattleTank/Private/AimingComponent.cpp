@@ -69,13 +69,12 @@ void UAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 	{
 		auto AimDirection = OutLaunchVelocity.GetSafeNormal();
 		MoveBarrelTowards(AimDirection);
+		MoveTurretYaw(AimDirection);
 		auto Time = GetWorld()->GetTimeSeconds();
-		//UE_LOG(LogTemp, Warning, TEXT("%f: Aim solution found."), Time);
 	}
 	else
 	{
-		auto Time = GetWorld()->GetTimeSeconds();
-		//UE_LOG(LogTemp, Warning, TEXT("%f: No aim solution found."), Time);
+		// No solution found
 	}
 }
 
@@ -87,4 +86,13 @@ void UAimingComponent::MoveBarrelTowards(FVector AimDirection)
 	
 
 	Barrel->Elevate(DeltaRotator.Pitch);
+}
+void UAimingComponent::MoveTurretYaw(FVector AimDirection)
+{
+	auto TurretRotator = Turret->GetForwardVector().Rotation();
+	auto AimAsRotator = AimDirection.Rotation();
+	auto DeltaRotator = AimAsRotator - TurretRotator;
+
+	Turret->RotateTurret(DeltaRotator.Yaw);
+
 }

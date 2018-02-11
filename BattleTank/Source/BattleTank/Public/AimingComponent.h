@@ -43,4 +43,6 @@ private:
 	
 	void MoveBarrelTowards(FVector AimDirection);
 
+	void MoveTurretYaw(FVector AimDirection);
+
 };
