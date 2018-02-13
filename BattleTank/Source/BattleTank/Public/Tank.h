@@ -12,6 +12,7 @@ class UTankBarrel;
 class UTankTurret;
 class AProjectile;
 class UTankTrack;
+class UTankMovementComponent;
 
 UCLASS()
 class BATTLETANK_API ATank : public APawn
@@ -20,13 +21,13 @@ class BATTLETANK_API ATank : public APawn
 
 protected:
 	UAimingComponent * AimingComponent = nullptr;
+	UPROPERTY(BlueprintReadOnly)
+	UTankMovementComponent * TankMovementComponent = nullptr;
 
 
 public:
 	void AimAt(FVector HitLocation);
 
-	UFUNCTION(BlueprintCallable, Category = Setup)
-		void SetTrackReference(UTankTrack * TrackToSet);
 	UFUNCTION(BlueprintCallable, Category = Setup)
 		void SetBarrelRefrence(UTankBarrel* BarrelToSet);
 	UFUNCTION(BlueprintCallable, Category = Setup)

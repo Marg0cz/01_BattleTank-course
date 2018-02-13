@@ -5,6 +5,7 @@
 #include "Engine/World.h"
 #include "Projectile.h"
 #include "TankBarrel.h"
+#include "TankMovementComponent.h"
 #include "AimingComponent.h"
 
 
@@ -36,11 +37,6 @@ void ATank::AimAt(FVector HitLocation)
 {
 	AimingComponent->AimAt(HitLocation, LaunchSpeed);
 
-}
-
-void ATank::SetTrackReference(UTankTrack * TrackToSet)
-{
-	Track = TrackToSet;
 }
 
 void ATank::SetBarrelRefrence(UTankBarrel * BarrelToSet)
