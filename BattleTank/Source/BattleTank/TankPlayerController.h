@@ -7,7 +7,7 @@
 #include "TankPlayerController.generated.h"
 
 class ATank;
-
+class UAimingComponent;
 /**
  * 
  */
@@ -19,6 +19,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 	ATank * GetControlledTank() const;
 	
+	UFUNCTION(BlueprintImplementableEvent, Category = "Setup")
+		void FoundAimingComponent(UAimingComponent * AimCompRef);
+
 public:
 	void BeginPlay() override;
 

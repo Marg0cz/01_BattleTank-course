@@ -2,6 +2,7 @@
 
 
 #include "TankPlayerController.h"
+#include "AimingComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Tank.h"
 #include "Engine/World.h"
@@ -13,6 +14,16 @@
 void ATankPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	auto AimingComponent = GetControlledTank()->FindComponentByClass<UAimingComponent>();
+	if (ensure(AimingComponent))
+	{
+		FoundAimingComponent(AimingComponent);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Player controller can't find aiming component at Begin Play"));
+	}
+
 }
 
 void ATankPlayerController::Tick(float DeltaTime)
@@ -29,14 +40,12 @@ ATank * ATankPlayerController::GetControlledTank() const
 
 void ATankPlayerController::AimTowardsCrosshair()
 {
-	if (!GetControlledTank()){ return; }
-	else
+	if (!ensure(GetControlledTank())) { return; }
+
+	FVector HitLocation; // Out parameter
+	if (GetSightRayHitLocation(HitLocation))
 	{
-		FVector HitLocation; // Out parameter
-		if (GetSightRayHitLocation(HitLocation))
-		{
-			GetControlledTank()->AimAt(HitLocation);
-		}
+		GetControlledTank()->AimAt(HitLocation);
 	}
 }
 
@@ -46,11 +55,11 @@ bool ATankPlayerController::GetSightRayHitLocation(FVector &HitLocation) const
 	int32 ViewportSizeX, ViewportSizeY;
 	GetViewportSize(ViewportSizeX, ViewportSizeY);
 	auto ScreenLocation = FVector2D((ViewportSizeX * CrosshairLocationX), (ViewportSizeY * CrosshairLocationY));
-	
+
 	// "De-project" the screen position of the crosshair to a world direction
 	FVector LookDirection;
 
-	if(GetLookDirection(ScreenLocation, LookDirection))
+	if (GetLookDirection(ScreenLocation, LookDirection))
 	{
 		GetLookVectorHitLocation(LookDirection, HitLocation);
 	}
@@ -65,10 +74,10 @@ bool ATankPlayerController::GetLookDirection(FVector2D ScreenLocation, FVector& 
 	return DeprojectScreenPositionToWorld(
 		ScreenLocation.X,
 		ScreenLocation.Y,
-		CameraWorldLocation, 
+		CameraWorldLocation,
 		LookDirection
 	);
-	
+
 }
 
 bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVector& HitLocation) const
