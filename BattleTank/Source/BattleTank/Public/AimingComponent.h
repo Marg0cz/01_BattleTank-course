@@ -8,6 +8,16 @@
 #include "Kismet/GameplayStatics.h"
 #include "AimingComponent.generated.h"
 
+// Enum for aiming state
+UENUM()
+enum class EFiringState : uint8
+{
+	Reloading,
+	Aiming,
+	Locked
+};
+
+
 //Forward Declaration
 class UTankBarrel; 
 class UTankTurret;
@@ -20,16 +30,19 @@ class BATTLETANK_API UAimingComponent : public UActorComponent
 
 public:	
 	// Sets default values for this component's properties
-	UAimingComponent();
 
-	void SetBarrelReference(UTankBarrel* BarrelToSet);
-	void SetTurretReference(UTankTurret * TurretToSet);
+
+	UFUNCTION(BlueprintCallable, Category = "Setup")
+		void Initialise(UTankBarrel * TankBarrelToSet, UTankTurret * TankTurretToSet);
 
 
 	//TODO add tank turret reference
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	UPROPERTY(BlueprintReadOnly, Category = "State")
+		EFiringState FiringStatus = EFiringState::Aiming;
 
 public:	
 	// Called every frame
@@ -38,11 +51,13 @@ public:
 	void AimAt(FVector HitLocation, float LaunchSpeed);
 
 private:
+	UAimingComponent();
+
 	UTankBarrel * Barrel = nullptr;
 	UTankTurret * Turret = nullptr;
 	
 	void MoveBarrelTowards(FVector AimDirection);
 
 	void MoveTurretYaw(FVector AimDirection);
-
+	
 };

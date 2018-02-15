@@ -19,14 +19,10 @@ UAimingComponent::UAimingComponent()
 }
 
 
-void UAimingComponent::SetBarrelReference(UTankBarrel * BarrelToSet)
+void UAimingComponent::Initialise(UTankBarrel * TankBarrelToSet, UTankTurret * TankTurretToSet)
 {
-	Barrel = BarrelToSet;
-}
-
-void UAimingComponent::SetTurretReference(UTankTurret * TurretToSet)
-{
-	Turret = TurretToSet;
+	Barrel = TankBarrelToSet;
+	Turret = TankTurretToSet;
 }
 
 // Called when the game starts
@@ -89,6 +85,7 @@ void UAimingComponent::MoveBarrelTowards(FVector AimDirection)
 }
 void UAimingComponent::MoveTurretYaw(FVector AimDirection)
 {
+	if (!Barrel || !Turret) { return; }
 	auto TurretRotator = Turret->GetForwardVector().Rotation();
 	auto AimAsRotator = AimDirection.Rotation();
 	auto DeltaRotator = AimAsRotator - TurretRotator;
