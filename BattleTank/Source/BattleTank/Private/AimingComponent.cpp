@@ -60,17 +60,13 @@ void UAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 		0,
 		ESuggestProjVelocityTraceOption::DoNotTrace
 	);
-
 	if (bHaveAimSolution)
 	{
+		
 		auto AimDirection = OutLaunchVelocity.GetSafeNormal();
 		MoveBarrelTowards(AimDirection);
 		MoveTurretYaw(AimDirection);
 		auto Time = GetWorld()->GetTimeSeconds();
-	}
-	else
-	{
-		// No solution found
 	}
 }
 
@@ -85,7 +81,8 @@ void UAimingComponent::MoveBarrelTowards(FVector AimDirection)
 }
 void UAimingComponent::MoveTurretYaw(FVector AimDirection)
 {
-	if (ensure(Barrel) || ensure(Turret)) { return; }
+	if (!ensure(Barrel) || !ensure(Turret)) { return; }
+	UE_LOG(LogTemp, Warning, TEXT("It Works"));
 	auto TurretRotator = Turret->GetForwardVector().Rotation();
 	auto AimAsRotator = AimDirection.Rotation();
 	auto DeltaRotator = AimAsRotator - TurretRotator;
