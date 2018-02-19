@@ -6,7 +6,6 @@
 #include "GameFramework/PlayerController.h"
 #include "TankPlayerController.generated.h"
 
-class ATank;
 class UAimingComponent;
 /**
  * 
@@ -16,9 +15,6 @@ class BATTLETANK_API ATankPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 protected:
-	UFUNCTION(BlueprintCallable, Category = "Setup")
-	ATank * GetControlledTank() const;
-	
 	UFUNCTION(BlueprintImplementableEvent, Category = "Setup")
 		void FoundAimingComponent(UAimingComponent * AimCompRef);
 
@@ -26,6 +22,7 @@ public:
 	void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
+
 private:
 	// Return current start of reach line
 
@@ -43,5 +40,4 @@ private:
 	bool GetLookVectorHitLocation(FVector LookDirection, FVector& HitLocation) const;
 
 	int32 LineTraceRange = 1000000;
-	
 };

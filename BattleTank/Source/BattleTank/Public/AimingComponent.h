@@ -14,23 +14,26 @@ enum class EFiringState : uint8
 {
 	Reloading,
 	Aiming,
-	Locked
+	Locked,
+	NoAmmo
 };
 
 
 //Forward Declaration
-class UTankBarrel; 
+class UTankBarrel;
 class UTankTurret;
+class AProjectile;
 
 // Holds barrel's properties and Elevate method
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class BATTLETANK_API UAimingComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
-
+	UPROPERTY(EditDefaultsOnly)
+		float LaunchSpeed = 5000;
 
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 		void Initialise(UTankBarrel * TankBarrelToSet, UTankTurret * TankTurretToSet);
@@ -42,22 +45,45 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(BlueprintReadOnly, Category = "State")
-		EFiringState FiringStatus = EFiringState::Reloading;
+		EFiringState FiringState = EFiringState::Reloading;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+public:
 
-	void AimAt(FVector HitLocation, float LaunchSpeed);
+	void AimAt(FVector HitLocation);
+
+	UFUNCTION(BlueprintCallable)
+		void Fire();
+
+	EFiringState GetFiringState() const;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Gameplay")
+		int Ammunition = 3;
+	UFUNCTION(BlueprintCallable)
+		int GetAmmunition() const;
 
 private:
 	UAimingComponent();
 
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	void MoveBarrelTowards();
+
+	void MoveTurretYaw();
+
+	FVector AimDirection;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+		TSubclassOf<AProjectile> BlueprintSpawnable;
+
 	UTankBarrel * Barrel = nullptr;
 	UTankTurret * Turret = nullptr;
-	
-	void MoveBarrelTowards(FVector AimDirection);
 
-	void MoveTurretYaw(FVector AimDirection);
+	bool IsBarrelMoving();
+
+	float ReloadTimeInSeconds = 3;
+
+	double LastFireTime = 0;
+
 	
 };

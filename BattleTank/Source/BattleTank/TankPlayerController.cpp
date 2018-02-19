@@ -1,23 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "TankPlayerController.h"
 #include "AimingComponent.h"
 #include "Components/PrimitiveComponent.h"
-#include "Tank.h"
 #include "Engine/World.h"
-
-
-
 
 
 void ATankPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	auto AimingComponent = GetControlledTank()->FindComponentByClass<UAimingComponent>();
+	auto AimingComponent = GetPawn()->FindComponentByClass<UAimingComponent>();
 	if (!ensure(AimingComponent)) { return; }
 		FoundAimingComponent(AimingComponent);
-
 }
 
 void ATankPlayerController::Tick(float DeltaTime)
@@ -27,19 +21,17 @@ void ATankPlayerController::Tick(float DeltaTime)
 
 }
 
-ATank * ATankPlayerController::GetControlledTank() const
-{
-	return Cast<ATank>(GetPawn());
-}
-
 void ATankPlayerController::AimTowardsCrosshair()
 {
-	if (!ensure(GetControlledTank())) { return; }
+	if (!GetPawn()) { return; }
+
+	auto AimingComponent = GetPawn()->FindComponentByClass<UAimingComponent>();
+	if (!ensure(AimingComponent)) { return; }
 
 	FVector HitLocation; // Out parameter
 	if (GetSightRayHitLocation(HitLocation))
 	{
-		GetControlledTank()->AimAt(HitLocation);
+		AimingComponent->AimAt(HitLocation);
 	}
 }
 
@@ -55,10 +47,9 @@ bool ATankPlayerController::GetSightRayHitLocation(FVector &HitLocation) const
 
 	if (GetLookDirection(ScreenLocation, LookDirection))
 	{
-		GetLookVectorHitLocation(LookDirection, HitLocation);
+		return GetLookVectorHitLocation(LookDirection, HitLocation);
 	}
-
-	return true;
+	return false;
 }
 
 // Gets look direction of crosshair
@@ -95,4 +86,3 @@ bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVec
 		return false; // Line trace didn't succeed
 	}
 }
-

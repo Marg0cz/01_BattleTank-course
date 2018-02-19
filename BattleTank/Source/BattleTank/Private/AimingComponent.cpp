@@ -4,6 +4,7 @@
 #include "TankTurret.h"
 #include "TankBarrel.h"
 #include "Engine/World.h"
+#include "Projectile.h"
 #include "Tank.h"
 
 
@@ -29,8 +30,7 @@ void UAimingComponent::Initialise(UTankBarrel * TankBarrelToSet, UTankTurret * T
 void UAimingComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
+	LastFireTime = GetWorld()->GetTimeSeconds();
 
 }
 
@@ -39,10 +39,32 @@ void UAimingComponent::BeginPlay()
 void UAimingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	// ...
+	if (Ammunition <= 0)
+	{
+		FiringState = EFiringState::NoAmmo;
+	}
+
+	else if ((GetWorld()->GetTimeSeconds() - LastFireTime) < ReloadTimeInSeconds)
+	{
+		FiringState = EFiringState::Reloading;
+	}
+	else if (IsBarrelMoving())
+	{
+		FiringState = EFiringState::Aiming;
+	}
+
+	else
+	{
+		FiringState = EFiringState::Locked;
+	}
 }
 
-void UAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
+int UAimingComponent::GetAmmunition() const
+{
+	return Ammunition;
+}
+
+void UAimingComponent::AimAt(FVector HitLocation)
 {
 	if (!ensure(Barrel)) { return; }
 
@@ -62,31 +84,61 @@ void UAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 	);
 	if (bHaveAimSolution)
 	{
-		
-		auto AimDirection = OutLaunchVelocity.GetSafeNormal();
-		MoveBarrelTowards(AimDirection);
-		MoveTurretYaw(AimDirection);
-		auto Time = GetWorld()->GetTimeSeconds();
+		AimDirection = OutLaunchVelocity.GetSafeNormal();
+		MoveBarrelTowards();
+		MoveTurretYaw();
 	}
 }
 
-void UAimingComponent::MoveBarrelTowards(FVector AimDirection)
+void UAimingComponent::MoveBarrelTowards()
 {
 	auto BarrelRotator = Barrel->GetForwardVector().Rotation();
 	auto AimAsRotator = AimDirection.Rotation();
 	auto DeltaRotator = AimAsRotator - BarrelRotator;
-	
+
 
 	Barrel->Elevate(DeltaRotator.Pitch);
 }
-void UAimingComponent::MoveTurretYaw(FVector AimDirection)
+void UAimingComponent::MoveTurretYaw()
 {
 	if (!ensure(Barrel) || !ensure(Turret)) { return; }
-	UE_LOG(LogTemp, Warning, TEXT("It Works"));
 	auto TurretRotator = Turret->GetForwardVector().Rotation();
 	auto AimAsRotator = AimDirection.Rotation();
 	auto DeltaRotator = AimAsRotator - TurretRotator;
 
-	Turret->RotateTurret(DeltaRotator.Yaw);
+	if (FMath::Abs(DeltaRotator.Yaw) > 180)
+		Turret->RotateTurret(-DeltaRotator.Yaw);
+	else
+		Turret->RotateTurret(DeltaRotator.Yaw);
 
+}
+
+bool UAimingComponent::IsBarrelMoving()
+{
+	if (!ensure(Barrel)) { return false; }
+	return !(Barrel->GetForwardVector().Equals(AimDirection, 0.01f));
+}
+
+void UAimingComponent::Fire()
+{
+	if (FiringState == EFiringState::Locked || FiringState == EFiringState::Aiming)
+	{
+
+		if (!ensure(Barrel)) { return; }
+		if (!ensure(BlueprintSpawnable)) { return; }
+
+		auto Projectile = GetWorld()->SpawnActor<AProjectile>(BlueprintSpawnable,
+			Barrel->GetSocketLocation(FName("Projectile")),
+			Barrel->GetSocketRotation(FName("Projectile"))
+			);
+		if (!ensure(Projectile)) { return; }
+		Projectile->LaunchProjectile(LaunchSpeed);
+		LastFireTime = GetWorld()->GetTimeSeconds();
+		Ammunition--;
+	}
+}
+
+EFiringState UAimingComponent::GetFiringState() const
+{
+	return FiringState;
 }
